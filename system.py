@@ -1,11 +1,17 @@
 from process import Process
 
 class System:
-    def __init__(self):
+    def __init__(self, overhead):
         self.processes = []
-
-    def add_process(self, arrival_time, execution_time, deadline, priority, system_overhead):
+        self.overhead = overhead
+        
+    def add_process(self, arrival_time, exec_time, deadline, priority):
         process_id = len(self.processes) + 1
-        process = Process(process_id, execution_time, priority, deadline, arrival_time)
-        process.system_overhead = system_overhead
+        process = Process(id            = process_id, 
+                          exec_time     = exec_time, 
+                          priority      = priority, 
+                          deadline      = deadline, 
+                          arrival_time  = arrival_time)
+
+        process.system_overhead = self.overhead
         self.processes.append(process)
