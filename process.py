@@ -6,7 +6,4 @@ class Process:
         self.execution_time = exec_time
         self.deadline = deadline
         self.priority = priority
-        #self.system_overhead = system_overhead
 
-
-    
