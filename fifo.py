@@ -1,6 +1,7 @@
 from process import Process
+from algorithm import Algorithm
 
-class Fifo:
+class Fifo(Algorithm):
     def __init__(self, processes=[]):
         self.processes = processes
 
@@ -11,7 +12,7 @@ class Fifo:
         for process in self.processes:
             if current_time < process.arrival_time:
                 current_time = process.arrival_time
-            execution_time = process.execution_time
-            current_time += execution_time + process.system_overhead
+
+            current_time += process.execution_time
             print(f"Process {process.id} executed. Finish time: {current_time}")
-            
+
