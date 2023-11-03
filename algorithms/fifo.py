@@ -1,15 +1,13 @@
-from process import Process
-from algorithm import Algorithm
+from algorithms.algorithm import Algorithm
 
 class Fifo(Algorithm):
-    def __init__(self, processes=[]):
-        self.processes = processes
 
     def execute(self):
-        self.processes.sort(key=lambda x: x.arrival_time)  # Ordena os processos com base no tempo de chegada
+        self.processes.sort(key=lambda x: x.arrival_time)  # Orders processes based on arrival time
         current_time = 0
 
         for process in self.processes:
+            # Check if the new process in the queue arrived in less time than the current one
             if current_time < process.arrival_time:
                 current_time = process.arrival_time
 
