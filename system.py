@@ -1,8 +1,4 @@
 from process import Process
-from algorithms.fifo import Fifo
-from algorithms.sjf import SJF
-from algorithms.round_robin import RoundRobin
-from algorithms.edf import EDF
 from algorithms.algorithm import Algorithm
 
 class System:
