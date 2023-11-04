@@ -32,7 +32,3 @@ class RoundRobin(Algorithm):
                 f"Time: {time}")
 
                 queue.put(current_process)
-
-            # Verifique se há mais processos chegando no tempo atual
-            # while not queue.empty() and queue.queue[0].arrival_time <= time:
-            #         queue.put(queue.get())
