@@ -19,5 +19,5 @@ class System:
         self.processes.append(process)
         
     def exec_algorithm(self, algorithm: Algorithm):
-        algorithm_scheduler = algorithm(self.processes)
+        algorithm_scheduler = algorithm(self.processes, self.overhead)
         algorithm_scheduler.execute()

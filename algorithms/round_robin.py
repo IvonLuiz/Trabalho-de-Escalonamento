@@ -19,10 +19,10 @@ class RoundRobin(Algorithm):
             current_process = queue.get()
             
             if current_process.execution_time <= self.quantum:
-                    # The process is completed within the current quantum
-                    time += current_process.execution_time
-                    current_process.execution_time = 0
-                    print(f"Process {current_process.id} executed. Finish time: {time}")
+                # The process is completed within the current quantum
+                time += current_process.execution_time
+                current_process.execution_time = 0
+                print(f"Process {current_process.id} executed. Finish time: {time}")
             else:
                 # O processo ainda tem tempo restante após o quantum
                 time += self.quantum + self.overhead
