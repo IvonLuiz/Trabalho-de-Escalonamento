@@ -6,4 +6,8 @@ class Process:
         self.execution_time = exec_time
         self.deadline = deadline
         self.priority = priority
+        
+    def reduce_exec_time(self, time_reduce):
+        self.execution_time -= time_reduce 
+        
 
