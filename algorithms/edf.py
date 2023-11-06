@@ -1,15 +1,77 @@
+from queue import PriorityQueue
 from algorithms.algorithm import Algorithm
 
 class EDF(Algorithm):
 
+    def __init__(self, processes=[], overhead=1, quantum=2):
+        self.processes = processes
+        self.overhead = overhead
+        self.quantum = quantum
+        self.process_queue = {} # Keys: process, Values: deadline - execution_time
+
     def execute(self):
-        self.processes.sort(key=lambda x: x.deadline)  # orders processed based on earliest deadline
-        current_time = 0
+        time = 0
+        current_process = None
+        # Case process enters late
+        self.__verify_late_arrival(time)
 
-        for process in self.processes:
-            # Check if the new process in the queue arrived in less time than the current one
-            # if current_time < process.arrival_time:
-            #     current_time = process.arrival_time
+        while True:
+            current_process = next(iter(self.process_queue), None)
+            del self.process_queue[current_process]
+            
+            if current_process.execution_time <= self.quantum:
+                # The process is completed within the current quantum
+                time += current_process.execution_time
+                current_process.execution_time = 0
+                print(f"Process {current_process.id} executed. Finish time: {time}")
+                self.__verify_arrival_while_processing(time)
+            else:
+                # The process still has time remaining after the quantum
+                time += self.quantum + self.overhead
+                current_process.reduce_exec_time(self.quantum)
+                print(f"Process {current_process.id} executed for {self.quantum} units. "
+                f"Time to finish: {current_process.execution_time}. "
+                f"Time: {time}")
+                
+                self.__verify_arrival_while_processing(time)
+                self.__add_process_with_priority(current_process, time)
+        
+            # Case process enters late
+            time = self.__verify_late_arrival(time)
+            
+            if len(self.process_queue) == 0:
+                break
 
-            current_time += process.execution_time
-            print(f"Process {process.id} executed. Finish time: {current_time}")
+
+    def __verify_arrival_while_processing(self, time):
+        to_remove = []
+        for i, proc in enumerate(self.processes):
+            if proc.arrival_time <= time:
+                self.__add_process_with_priority(proc, time)
+                to_remove.append(i)  
+                
+        for index in reversed(to_remove):
+            self.processes.pop(index)
+
+    
+    def __verify_late_arrival(self, time):
+        if len(self.process_queue) == 0 and len(self.processes) > 0:
+            proc = self.processes[0]
+            self.__add_process_with_priority(proc, time)
+            self.processes.pop(0)
+            time = proc.arrival_time
+        return time
+    
+    
+    def __add_process_with_priority(self, process, time):
+        # Calculate the priority (value) for the process and add it to the process_queue dictionary
+        self.process_queue[process] = process.deadline - time
+
+        # Sort the dictionary based on values
+        sorted_queue = sorted(self.process_queue.items(), key=lambda item: item[1])
+
+        # Create a new sorted dictionary
+        sorted_dict = {key: value for key, value in sorted_queue}
+
+        # Update the original dictionary (self.process_queue) with the new sorted dictionary
+        self.process_queue = sorted_dict
