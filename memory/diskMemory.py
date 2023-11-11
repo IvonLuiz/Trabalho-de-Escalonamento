@@ -1,7 +1,7 @@
 class Disk:
     def __init__(self, storage, storageLeft) -> None:
-        self.storage= [0]*250
-        self.storageLeft= 250
+        self.storage= [0]*storage #Será 250
+        self.storageLeft= storage #Será 250
 
     def storeItem(self, processId, numberOfPages):
         if numberOfPages<= self.storageLeft:
