@@ -19,12 +19,15 @@ class Disk:
 
 
     def removeItem(self, processId, numberOfPages):
-            currentPage= 0
-            pagesRemoved= 0
-            while pagesRemoved<numberOfPages:
-                if self.storage[currentPage] == processId:
-                    self.storage[currentPage]= 0
-                    pagesRemoved+= 1
-               
-                currentPage+= 1
-            self.storageLeft+= pagesRemoved
+        currentPage= 0
+        pagesRemoved= 0
+        while pagesRemoved<numberOfPages:
+            if self.storage[currentPage] == processId:
+                self.storage[currentPage]= 0
+                print(pagesRemoved)
+                pagesRemoved+= 1
+            
+            currentPage+= 1
+        self.storageLeft+= pagesRemoved
+        return pagesRemoved
+        

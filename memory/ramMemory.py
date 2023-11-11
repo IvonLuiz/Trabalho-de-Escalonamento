@@ -42,7 +42,7 @@ class Ram:
                 return pagesWritten
 
 
-""""ram= Ram(50,50)
+"""ram= Ram(50,50)
 print(ram.storage)
 print(ram.storageLeft)
 
@@ -68,11 +68,16 @@ print(ram.storageLeft)
 print(written)
 
 #ram está cheia
-spaceNeeded= 33
-removalQueue= [4, 2, 5, 8]
+spaceNeeded= 15
+removalQueue= [8, 2, 5, 4]
 pages= [20, 10, 15, 20]
+
+if 8 == removalQueue[0] and spaceNeeded>0:
+    removalQueue.pop(0)
+    pages.pop(0)
+
 while spaceNeeded>0:
-    written= ram.write(9, removalQueue[0], spaceNeeded)
+    written= ram.write(8, removalQueue[0], spaceNeeded)
     spaceNeeded-= written
     pages[0]-=written
     if pages[0] <= 0:

@@ -16,7 +16,7 @@ class RoundRobin(Algorithm):
         self.__verify_late_arrival(time)
 
         while True:
-            current_process = self.process_queue.get()            
+            current_process = self.process_queue.get()
                             
             if current_process.execution_time <= self.quantum:
                 # The process is completed within the current quantum
