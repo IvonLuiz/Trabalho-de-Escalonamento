@@ -30,7 +30,7 @@ class CSVReader:
 
 
 if __name__ == '__main__':
-    csv_file = 'input_file.csv'
+    csv_file = 'csv/input_file.csv'
     for process in CSVReader(csv_file).get_processes():
         print(f"Process ID: {process.id}")
         print(f"Arrival Time: {process.arrival_time}")
