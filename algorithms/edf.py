@@ -1,5 +1,6 @@
-from queue import PriorityQueue
 from algorithms.algorithm import Algorithm
+from process import Process
+
 
 class EDF(Algorithm):
 
@@ -18,7 +19,7 @@ class EDF(Algorithm):
         while True:
             current_process = next(iter(self.process_queue), None)
             del self.process_queue[current_process]
-            
+
             if current_process.execution_time <= self.quantum:
                 # The process is completed within the current quantum
                 time += current_process.execution_time
@@ -32,13 +33,13 @@ class EDF(Algorithm):
                 print(f"Process {current_process.id} executed for {self.quantum} units. "
                 f"Time to finish: {current_process.execution_time}. "
                 f"Time: {time}")
-                
+
                 self.__verify_arrival_while_processing(time)
                 self.__add_process_with_priority(current_process, time)
-        
+
             # Case process enters late
             time = self.__verify_late_arrival(time)
-            
+
             if len(self.process_queue) == 0:
                 break
 
@@ -48,12 +49,12 @@ class EDF(Algorithm):
         for i, proc in enumerate(self.processes):
             if proc.arrival_time <= time:
                 self.__add_process_with_priority(proc, time)
-                to_remove.append(i)  
-                
+                to_remove.append(i)
+
         for index in reversed(to_remove):
             self.processes.pop(index)
 
-    
+
     def __verify_late_arrival(self, time):
         if len(self.process_queue) == 0 and len(self.processes) > 0:
             proc = self.processes[0]
@@ -61,8 +62,8 @@ class EDF(Algorithm):
             self.processes.pop(0)
             time = proc.arrival_time
         return time
-    
-    
+
+
     def __add_process_with_priority(self, process, time):
         # Calculate the priority (value) for the process and add it to the process_queue dictionary
         self.process_queue[process] = process.deadline - time
@@ -75,3 +76,20 @@ class EDF(Algorithm):
 
         # Update the original dictionary (self.process_queue) with the new sorted dictionary
         self.process_queue = sorted_dict
+
+
+if __name__ == "__main__":
+    processes = [
+        Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
+        Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
+        Process(id=3, exec_time=7, priority=3, deadline=15, arrival_time=2),
+    ]
+
+    edf = EDF(processes)
+    execution_intervals = edf.execute()
+
+    print(execution_intervals)
+
+    print("Execution Intervals:")
+    for process_id, interval in execution_intervals.items():
+        print(f"Process {process_id}: {interval}")
