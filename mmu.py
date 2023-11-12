@@ -58,8 +58,9 @@ class MemoryManagementUnit:
         pagesWritten= 0
 
         if processId == self.removalQueue[0] and spaceNeeded>0:
-            self.removalQueue.pop(0)
-            self.pages.pop(0)
+            #self.removalQueue.pop(0)
+            #self.pages.pop(0)
+            self.removeFromLists(0)
 
         while spaceNeeded>0:
             if self.ram.storageLeft > 0:
@@ -81,8 +82,11 @@ class MemoryManagementUnit:
             pagesWritten+=written
             self.pages[0]-=written
             if self.pages[0] <= 0:
-                self.removalQueue.pop(0)
-                self.pages.pop(0)
+                #self.removalQueue.pop(0)
+                #self.pages.pop(0)
+                self.removeFromLists(0)
+            
+                
             
             
         
@@ -97,8 +101,11 @@ class MemoryManagementUnit:
         else:
 
             #Houve escrita na memória e um processo entrou na lista de remoção FIFO no final
-            self.removalQueue.append(processId)
-            self.pages.append(numberOfPages)
+            #self.removalQueue.append(processId)
+            #self.pages.append(numberOfPages)
+                     
+            self.appendToLists(processId, numberOfPages)
+        
             return
 
 
@@ -110,23 +117,38 @@ class MemoryManagementUnit:
              
             #Encontro o local do processo na lista de remoção
             index= self.removalQueue.index(processId)
-            self.removalQueue.pop(index) #Removo da lista de remoção no index encontrado
-            self.pages.pop(index) #Removo da lista de páginas no index encontrado
+            #self.removalQueue.pop(index) #Removo da lista de remoção no index encontrado
+            #self.pages.pop(index) #Removo da lista de páginas no index encontrado
+            
+            self.removeFromLists(index)
 
             #Coloco o processo no fim da lista de remoção pois foi o processo mais recente
-            self.removalQueue.append(processId)
+            #self.removalQueue.append(processId)
             #Coloco o processo no fim da lista páginas pois foi o processo mais recente
-            self.pages.append(numberOfPages)
+            #self.pages.append(numberOfPages)
+            
+            self.appendToLists(processId, numberOfPages)
+            
+            
             return
         else:
 
             #Houve escrita na memória e um processo entrou na lista de remoção FIFO no final
-            self.removalQueue.append(processId)
-            self.pages.append(numberOfPages)   
+            #self.removalQueue.append(processId)
+            #self.pages.append(numberOfPages)  
+
+            self.appendToLists(processId, numberOfPages)
+            
             return     
 
-    
 
+    def appendToLists(self, processId, numberOfPages):
+        self.removalQueue.append(processId)
+        self.pages.append(numberOfPages)   
+        
+    def removeFromLists(self, index):
+        self.removalQueue.pop(index) #Removo da lista de remoção no index encontrado
+        self.pages.pop(index) #Removo da lista de páginas no index encontrado
 
 
 """process= []
