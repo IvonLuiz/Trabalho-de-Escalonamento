@@ -30,4 +30,3 @@ class Disk:
             currentPage+= 1
         self.storageLeft+= pagesRemoved
         return pagesRemoved
-        
