@@ -24,8 +24,8 @@ class Disk:
         while pagesRemoved<numberOfPages:
             if self.storage[currentPage] == processId:
                 self.storage[currentPage]= 0
-                print(pagesRemoved)
                 pagesRemoved+= 1
+
             
             currentPage+= 1
         self.storageLeft+= pagesRemoved

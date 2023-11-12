@@ -45,8 +45,7 @@ class MemoryManagementUnit:
             index= -1
 
         if index != -1: #Processo está na memória
-            if self.pages[index] == numberOfPages: #Processo está na memória em sua integridade (HIT)
-                return self.pages[index]
+            return self.pages[index]
         else: #Processo não está na memória
             return 0
 
@@ -56,10 +55,10 @@ class MemoryManagementUnit:
         lookup= self.lookup(processId, numberOfPages)
         spaceNeeded= numberOfPages-lookup
         pagesWritten= 0
+        removedFromDisk = 0
+        storedOnDisk = 0
 
         if processId == self.removalQueue[0] and spaceNeeded>0:
-            #self.removalQueue.pop(0)
-            #self.pages.pop(0)
             self.removeFromLists(0)
 
         while spaceNeeded>0:
@@ -67,29 +66,32 @@ class MemoryManagementUnit:
                 #Remover os dados do processo do disco
                 if spaceNeeded < self.ram.storageLeft:
                     self.disk.removeItem(processId, spaceNeeded)
+                    removedFromDisk += spaceNeeded
                 else:
                     self.disk.removeItem(processId, self.ram.storageLeft)
-
-            written= self.ram.write(processId, self.removalQueue[0], spaceNeeded)
-
-            #Retirar do disco a quantidade que foi passada para a ram
-            self.disk.removeItem(processId, written)
+                    removedFromDisk += self.ram.storageLeft
+                written= self.ram.write(processId, self.removalQueue[0], spaceNeeded)
+            else:
+                written= self.ram.write(processId, self.removalQueue[0], spaceNeeded)
+                
+                #Retirar do disco a quantidade que foi passada para a ram
+                self.disk.removeItem(processId, written)
+                removedFromDisk += written
 
             #Colocar no disco a quantidade que eu sobreescrevi na ram
             self.disk.storeItem(self.removalQueue[0], written)
+            storedOnDisk += written
 
             spaceNeeded-= written
             pagesWritten+=written
             self.pages[0]-=written
             if self.pages[0] <= 0:
-                #self.removalQueue.pop(0)
-                #self.pages.pop(0)
                 self.removeFromLists(0)
             
-                
             
-            
-        
+        print(f"removedFromDisk = {removedFromDisk}")
+        print(f"storedOnDisk = {storedOnDisk}" )
+        print(f"pagesWritten = {pagesWritten}")
         return pagesWritten
 
 
@@ -101,11 +103,7 @@ class MemoryManagementUnit:
         else:
 
             #Houve escrita na memória e um processo entrou na lista de remoção FIFO no final
-            #self.removalQueue.append(processId)
-            #self.pages.append(numberOfPages)
-                     
             self.appendToLists(processId, numberOfPages)
-        
             return
 
 
@@ -117,29 +115,20 @@ class MemoryManagementUnit:
              
             #Encontro o local do processo na lista de remoção
             index= self.removalQueue.index(processId)
-            #self.removalQueue.pop(index) #Removo da lista de remoção no index encontrado
-            #self.pages.pop(index) #Removo da lista de páginas no index encontrado
-            
-            self.removeFromLists(index)
+            self.removeFromLists(index) #Removo das listas
 
             #Coloco o processo no fim da lista de remoção pois foi o processo mais recente
-            #self.removalQueue.append(processId)
-            #Coloco o processo no fim da lista páginas pois foi o processo mais recente
-            #self.pages.append(numberOfPages)
-            
             self.appendToLists(processId, numberOfPages)
-            
             
             return
         else:
 
             #Houve escrita na memória e um processo entrou na lista de remoção FIFO no final
-            #self.removalQueue.append(processId)
-            #self.pages.append(numberOfPages)  
-
             self.appendToLists(processId, numberOfPages)
-            
+        
             return     
+
+    
 
 
     def appendToLists(self, processId, numberOfPages):
@@ -160,8 +149,64 @@ process.append(Process(4, 0, 10, 5, 10, 0))
 process.append(Process(9, 0, 10, 5, 43, 0))"""
 
 
-mmu= MemoryManagementUnit('fifo', process)
+mmu= MemoryManagementUnit('lru', process)
 
-mmu.load(1, 20)
 print(mmu.ram.storage)
 print(mmu.disk.storage)
+
+print("id = 1")
+mmu.load(1, 20)
+print(mmu.removalQueue)
+print(mmu.pages)
+print(mmu.ram.storage)
+print(mmu.disk.storage)
+
+
+print("id = 3")
+mmu.load(3, 15)
+print(mmu.removalQueue)
+print(mmu.pages)
+print(mmu.ram.storage)
+print(mmu.disk.storage)
+
+
+
+print("id = 1")
+mmu.load(1, 20)
+print(mmu.removalQueue)
+print(mmu.pages)
+print(mmu.ram.storage)
+print(mmu.disk.storage)
+
+
+print("id = 9")
+mmu.load(9, 43)
+print(mmu.removalQueue)
+print(mmu.pages)
+print(mmu.ram.storage)
+print(mmu.disk.storage)
+
+
+print("id = 4")
+mmu.load(4, 10)
+print(mmu.removalQueue)
+print(mmu.pages)
+print(mmu.ram.storage)
+print(mmu.disk.storage)
+
+
+print("id = 9")
+mmu.load(9, 43)
+print(mmu.removalQueue)
+print(mmu.pages)
+print(mmu.ram.storage)
+print(mmu.disk.storage)
+
+
+print("id = 2")
+mmu.load(2, 13)
+print(mmu.removalQueue)
+print(mmu.pages)
+print(mmu.ram.storage)
+print(mmu.disk.storage)
+
