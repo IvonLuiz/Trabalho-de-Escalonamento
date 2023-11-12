@@ -96,6 +96,7 @@ class MemoryManagementUnit:
 
 
 
+
     def fifo(self, processId, numberOfPages):
         pagesWritten= self.ramWrite(processId, numberOfPages)
         if pagesWritten == 0: #Processo está na memória em sua integridade (HIT)
