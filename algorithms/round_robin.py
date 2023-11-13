@@ -14,19 +14,22 @@ class RoundRobin(Algorithm):
     def execute(self):
         time = 0
         current_process = None
-        execution_intervals = {}  # Dicionário para armazenar os intervalos de execução de cada processo
+        execution_intervals = {}
+        deadline_overrun_intervals = {}
 
         # Case process enters late
         self.__verify_late_arrival(time)
-
+        
         while True:
             current_process = self.process_queue.get()
-
+            
             if current_process.execution_time <= self.quantum:
                 # The process is completed within the current quantum
                 execution_intervals.setdefault(current_process.id, []).append((time, time + current_process.execution_time))
                 time += current_process.execution_time
+                deadline_overrun_intervals.setdefault(current_process.id, []).append(self.__detect_deadline_overrun(current_process, time))
                 current_process.execution_time = 0
+                
                 self.__verify_arrival_while_processing(time)
             else:
                 # The process still has time remaining after the quantum
@@ -39,11 +42,11 @@ class RoundRobin(Algorithm):
 
             # Case process enters late
             time = self.__verify_late_arrival(time)
-
+            
             if self.process_queue.empty():
                 break
 
-        return execution_intervals
+        return execution_intervals, deadline_overrun_intervals
 
     def __verify_arrival_while_processing(self, time):
         to_remove = []
@@ -61,9 +64,16 @@ class RoundRobin(Algorithm):
             self.process_queue.put(proc)
             self.processes.pop(0)
             time = proc.arrival_time
+            
         return time
 
-
+    def __detect_deadline_overrun(self, process: Process, time):
+        true_deadline = (process.arrival_time + process.deadline)
+        deadline_overrun = time - true_deadline
+        # Returns 0 if there isen't deadline_overrun
+        return max(0, deadline_overrun)
+        
+        
 if __name__ == "__main__":
     processes = [
         Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
@@ -72,7 +82,7 @@ if __name__ == "__main__":
     ]
 
     rr = RoundRobin(processes)
-    execution_intervals = rr.execute()
+    execution_intervals, deadline_overrun_intervals = rr.execute()
 
     print(execution_intervals)
 

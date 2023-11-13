@@ -13,6 +13,9 @@ class EDF(Algorithm):
     def execute(self):
         time = 0
         current_process = None
+        execution_intervals = {}
+        deadline_overrun_intervals = {}
+
         # Case process enters late
         self.__verify_late_arrival(time)
 
@@ -22,17 +25,17 @@ class EDF(Algorithm):
 
             if current_process.execution_time <= self.quantum:
                 # The process is completed within the current quantum
+                execution_intervals.setdefault(current_process.id, []).append((time, time + current_process.execution_time))
                 time += current_process.execution_time
+                deadline_overrun_intervals.setdefault(current_process.id, []).append(self.__detect_deadline_overrun(current_process, time))
                 current_process.execution_time = 0
-                print(f"Process {current_process.id} executed. Finish time: {time}")
+                
                 self.__verify_arrival_while_processing(time)
             else:
                 # The process still has time remaining after the quantum
+                execution_intervals.setdefault(current_process.id, []).append((time, time + self.quantum))
                 time += self.quantum + self.overhead
                 current_process.reduce_exec_time(self.quantum)
-                print(f"Process {current_process.id} executed for {self.quantum} units. "
-                f"Time to finish: {current_process.execution_time}. "
-                f"Time: {time}")
 
                 self.__verify_arrival_while_processing(time)
                 self.__add_process_with_priority(current_process, time)
@@ -42,7 +45,8 @@ class EDF(Algorithm):
 
             if len(self.process_queue) == 0:
                 break
-
+            
+        return execution_intervals, deadline_overrun_intervals
 
     def __verify_arrival_while_processing(self, time):
         to_remove = []
@@ -78,18 +82,25 @@ class EDF(Algorithm):
         self.process_queue = sorted_dict
 
 
-if __name__ == "__main__":
-    processes = [
-        Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
-        Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
-        Process(id=3, exec_time=7, priority=3, deadline=15, arrival_time=2),
-    ]
+    def __detect_deadline_overrun(self, process: Process, time):
+        true_deadline = (process.arrival_time + process.deadline)
+        deadline_overrun = time - true_deadline
+        # Returns 0 if there isen't deadline_overrun
+        return max(0, deadline_overrun)
 
-    edf = EDF(processes)
-    execution_intervals = edf.execute()
 
-    print(execution_intervals)
+# if __name__ == "__main__":
+#     processes = [
+#         Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
+#         Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
+#         Process(id=3, exec_time=7, priority=3, deadline=15, arrival_time=2),
+#     ]
 
-    print("Execution Intervals:")
-    for process_id, interval in execution_intervals.items():
-        print(f"Process {process_id}: {interval}")
+#     edf = EDF(processes)
+#     execution_intervals = edf.execute()
+
+#     print(execution_intervals)
+
+#     print("Execution Intervals:")
+#     for process_id, interval in execution_intervals.items():
+#         print(f"Process {process_id}: {interval}")
