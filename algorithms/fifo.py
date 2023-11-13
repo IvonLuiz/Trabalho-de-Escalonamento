@@ -6,30 +6,32 @@ class Fifo(Algorithm):
 
     def execute(self):
         self.processes.sort(key=lambda x: x.arrival_time)  # Orders processes based on arrival time
-        current_time = 0
-        execution_intervals = {}  # Dictionary to store execution intervals for each process
-
+        time = 0
+        execution_intervals = {}
+        deadline_overrun_intervals = {}
+        
         for process in self.processes:
             # Check if the new process in the queue arrived in less time than the current one
-            if current_time < process.arrival_time:
-                current_time = process.arrival_time
+            if time < process.arrival_time:
+                time = process.arrival_time
 
             intervals = []
-            start_time = current_time
+            start_time = time
 
             while process.execution_time > 0:
-                current_time += 1
+                time += 1
                 process.reduce_exec_time(1)
 
-            end_time = current_time
-
-            intervals.append((start_time, end_time))
+            intervals.append((start_time, time))
 
             execution_intervals[process.id] = intervals
+            deadline_overrun_intervals[process.id] = self.__detect_deadline_overrun(process, time)
 
-            print(f"Process {process.id} executed. Intervals: {intervals}")
+        return execution_intervals, deadline_overrun_intervals
 
-        return execution_intervals
+
+    def __detect_deadline_overrun(self, process: Process, time):
+        return 0
 
 
 # Example usage
@@ -41,10 +43,11 @@ if __name__ == "__main__":
     ]
 
     fifo_scheduler = Fifo(processes)
-    execution_intervals = fifo_scheduler.execute()
+    execution_intervals, deadline_overrun_intervals = fifo_scheduler.execute()
 
     print(execution_intervals)
-
+    print(deadline_overrun_intervals)
+    
     print("Execution Intervals:")
     for process_id, interval in execution_intervals.items():
         print(f"Process {process_id}: {interval}")
