@@ -6,56 +6,16 @@ from algorithms.round_robin import RoundRobin
 from csv_reader import CSVReader
 from process import Process
 
-# processes = [
-#     Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
-#     Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
-#     Process(id=3, exec_time=7, priority=3, deadline=30, arrival_time=2),
-# ]
-
-# rr = RoundRobin(processes)
-# execution_intervals, overload_intervals = rr.execute()
-
-# print(execution_intervals)
-# print(overload_intervals)
-
-# print("Execution Intervals:")
-
-
-# for process_id, interval in execution_intervals.items():
-#     print(f"Process {process_id}: {interval}")
-    
-
-# if __name__ == "__main__":
-#     processes = [
-#         Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
-#         Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
-#         Process(id=3, exec_time=7, priority=3, deadline=10, arrival_time=2),
-#     ]
-
-#     edf = EDF(processes)
-#     execution_intervals, overload_intervals = edf.execute()
-
-#     print("Execution Intervals:")
-#     for process_id, interval in execution_intervals.items():
-#         print(f"Process {process_id}: {interval}")
-#     print("Overload Intervals:")
-#     for process_id, overloads in overload_intervals.items():
-#         print(f"Process {process_id}: {overloads}")
+CSV_FILE = "csv/input_file.csv"
 
 # Example usage
 if __name__ == "__main__":
-    processes = [
-        Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
-        Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
-        Process(id=3, exec_time=7, priority=3, deadline=15, arrival_time=2),
-    ]
+    processes = CSVReader(CSV_FILE).get_processes()
+    system = System(processes, overhead=1, quantum=2)
 
-    fifo_scheduler = Fifo(processes)
-    execution_intervals, overload_intervals = fifo_scheduler.execute()
+    system.exec_algorithm(RoundRobin)
 
-    print(execution_intervals)
-    print(overload_intervals)
-    
-    print("Execution Intervals:")
-    for process_id, interval in execution_intervals.items():
-        print(f"Process {process_id}: {interval}")
+    print(system.processes)
+    print(system.execution_intervals)
+    print(system.deadline_overrun_intervals)
+    print(system.calculate_average_turnaround())

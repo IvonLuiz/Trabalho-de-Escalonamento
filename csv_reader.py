@@ -21,10 +21,10 @@ class CSVReader:
 
     def create_process(self, props, values):
         # Extract the values from the CSV row
-        id, arrival_time, execution_time, deadline, priority = map(int, values)
+        id, arrival_time, execution_time, deadline, priority, number_of_pages = map(int, values)
 
         # Create a Process instance with the extracted values
-        process = Process(id, execution_time, priority, deadline, arrival_time)
+        process = Process(id, execution_time, priority, deadline, number_of_pages, arrival_time)
 
         return process
 
@@ -37,4 +37,5 @@ if __name__ == '__main__':
         print(f"Execution Time: {process.execution_time}")
         print(f"Deadline: {process.deadline}")
         print(f"Priority: {process.priority}")
+        print(f"Number of Pages: {process.number_of_pages}")
         print()

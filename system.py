@@ -54,7 +54,7 @@ class System:
 
         return None
 
-    def get_process(self, process_id):
+    def get_process(self, process_id) -> Process:
         """
         Get the process object by ID.
 
@@ -80,11 +80,11 @@ class System:
             process_id, interval, has_overload = result
             current_process = self.get_process(process_id)
 
-            # Atualizar gráfico Gantt
-            self.update_gantt_chart(process_id, interval, has_overload)
-
             # Carregar processo na memória
             self.load_process(current_process)
+
+            # Atualizar gráfico Gantt
+            self.update_gantt_chart(process_id, interval, has_overload)
 
             # Atualizar gráfico de memória
             self.update_memory_plot()
@@ -92,15 +92,18 @@ class System:
             # Verificar deadline_overrun e atualizar o gráfico de Gantt
             self.check_and_update_deadline_overrun(process_id, interval)
 
-    def load_process(self, process):
+    def load_process(self, process: Process):
         """
         Load process into memory.
 
         Parameters:
         - process (Process): Process object to load into memory.
         """
-        # Implemente a lógica de carregamento do processo na memória aqui
-        pass
+
+        id = process.id
+        number_of_pages = process.number_of_pages
+
+        #mmu.load(id, number_of_pages)
 
     def update_gantt_chart(self, process_id, interval, has_overload):
         """
@@ -140,3 +143,21 @@ class System:
 
                 # Atualizar o gráfico de Gantt com a sobrecarga
                 self.update_gantt_chart(process_id, overload_interval, True)
+
+    def calculate_average_turnaround(self):
+        total_turnaround = 0
+        number_of_processes = len(self.execution_intervals)
+
+        for process_id, intervals in self.execution_intervals.items():
+            arrival_time = self.get_process(process_id).arrival_time
+            total_execution_time = 0
+
+            if intervals:
+                last_interval = intervals[-1]
+                total_execution_time = last_interval[1]
+
+            turnaround = total_execution_time - arrival_time
+            total_turnaround += turnaround
+
+        average_turnaround = total_turnaround / number_of_processes
+        return average_turnaround
