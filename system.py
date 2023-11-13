@@ -20,10 +20,11 @@ class System:
         self.quantum = quantum
         self.current_time = 0
         self.execution_intervals = {}
+        self.deadline_overrun_intervals = {}
 
     def exec_algorithm(self, algorithm: Algorithm):
         algorithm_scheduler = algorithm(self.processes)
-        self.execution_intervals = algorithm_scheduler.execute()
+        self.execution_intervals, self.deadline_overrun_intervals = algorithm_scheduler.execute()
 
     def get_next_execution_interval(self):
         """
@@ -32,6 +33,7 @@ class System:
         Returns:
         - result (tuple): Tuple containing (process_id, interval, has_overload).
         """
+        
         for process_id, intervals in self.execution_intervals.items():
             closest_interval = None
 
@@ -86,6 +88,9 @@ class System:
 
             # Atualizar gráfico de memória
             self.update_memory_plot()
+            
+            # Verificar deadline_overrun e atualizar o gráfico de Gantt
+            self.check_and_update_deadline_overrun(process_id, interval)
 
     def load_process(self, process):
         """
@@ -115,3 +120,23 @@ class System:
         """
         # Implemente a lógica de atualização do gráfico de memória aqui
         pass
+    
+##-----AINDA É PRECISO TESTAR ESSA PARTE-----#
+    def check_and_update_deadline_overrun(self, process_id, interval):
+            """
+            Check for deadline_overrun and update the Gantt chart accordingly.
+
+            Parameters:
+            - process_id (int): ID of the executed process.
+            - interval (tuple): Execution interval.
+            """
+            process = self.get_process(process_id)
+            true_deadline = process.arrival_time + process.deadline
+
+            # Verificar se houve deadline_overrun no intervalo
+            if interval[1] > true_deadline:
+                overload_start = max(interval[0], true_deadline)
+                overload_interval = (overload_start, interval[1])
+
+                # Atualizar o gráfico de Gantt com a sobrecarga
+                self.update_gantt_chart(process_id, overload_interval, True)
