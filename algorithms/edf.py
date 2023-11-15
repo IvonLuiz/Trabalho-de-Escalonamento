@@ -13,11 +13,12 @@ class EDF(Algorithm):
     def execute(self):
         time = 0
         current_process = None
+        self.processes.sort(key=lambda x: x.arrival_time)
         execution_intervals = {}
         deadline_overrun_intervals = {}
 
         # Case process enters late
-        self.__verify_late_arrival(time)
+        time = self.__verify_late_arrival(time)
 
         while True:
             current_process = next(iter(self.process_queue), None)
@@ -89,18 +90,19 @@ class EDF(Algorithm):
         return max(0, deadline_overrun)
 
 
-# if __name__ == "__main__":
-#     processes = [
-#         Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
-#         Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
-#         Process(id=3, exec_time=7, priority=3, deadline=15, arrival_time=2),
-#     ]
+if __name__ == "__main__":
+    processes = [
+        Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
+        Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
+        Process(id=3, exec_time=7, priority=3, deadline=15, arrival_time=2),
+    ]
 
-#     edf = EDF(processes)
-#     execution_intervals = edf.execute()
+    edf = EDF(processes)
+    execution_intervals, deadline_overrun_intervals = edf.execute()
 
-#     print(execution_intervals)
+    print(execution_intervals)
+    print(deadline_overrun_intervals)
 
-#     print("Execution Intervals:")
-#     for process_id, interval in execution_intervals.items():
-#         print(f"Process {process_id}: {interval}")
+    print("Execution Intervals:")
+    for process_id, interval in execution_intervals.items():
+        print(f"Process {process_id}: {interval}")

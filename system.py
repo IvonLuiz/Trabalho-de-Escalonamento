@@ -1,5 +1,9 @@
+import copy
+import time
+
 from process import Process
 from algorithms.algorithm import Algorithm
+from mmu import MemoryManagementUnit
 
 class System:
     """
@@ -21,9 +25,13 @@ class System:
         self.current_time = 0
         self.execution_intervals = {}
         self.deadline_overrun_intervals = {}
+        self.memory = None
 
-    def exec_algorithm(self, algorithm: Algorithm):
-        algorithm_scheduler = algorithm(self.processes)
+    def exec_algorithm(self, algorithm: Algorithm, paging_algorithm):
+        process_copy = copy.copy(self.processes)
+        process_copy_mmu = copy.copy(self.processes)
+        algorithm_scheduler = algorithm(process_copy)
+        self.memory = MemoryManagementUnit(algorithm=paging_algorithm, processList=process_copy_mmu)
         self.execution_intervals, self.deadline_overrun_intervals = algorithm_scheduler.execute()
 
     def get_next_execution_interval(self):
@@ -33,28 +41,29 @@ class System:
         Returns:
         - result (tuple): Tuple containing (process_id, interval, has_overload).
         """
-        
-        for process_id, intervals in self.execution_intervals.items():
-            closest_interval = None
+        closest_interval = None
+        process_id = 0
+        has_overload = False
 
+        for it_process_id, intervals in self.execution_intervals.items():
             for start_time, end_time in intervals:
                 if start_time >= self.current_time and (closest_interval is None or start_time < closest_interval[0]):
                     closest_interval = (start_time, end_time)
+                    has_overload = (
+                            intervals.index(closest_interval) + 1 < len(intervals)
+                            and intervals[intervals.index(closest_interval) + 1][0] == closest_interval[1]
+                    )
+                    process_id = it_process_id
 
-            if closest_interval:
-                has_overload = (
-                    intervals.index(closest_interval) + 1 < len(intervals)
-                    and intervals[intervals.index(closest_interval) + 1][0] == closest_interval[1]
-                )
+        if closest_interval is None:
+            return None
 
-                # Update the current time
-                self.current_time = closest_interval[1] + (1 if has_overload else 0)
+        # Update the current time
+        self.current_time = closest_interval[1] + (1 if has_overload else 0)
 
-                return process_id, closest_interval, has_overload
+        return process_id, closest_interval, has_overload
 
-        return None
-
-    def get_process(self, process_id):
+    def get_process(self, process_id) -> Process:
         """
         Get the process object by ID.
 
@@ -64,6 +73,7 @@ class System:
         Returns:
         - process (Process): Process object.
         """
+
         for process in self.processes:
             if process.id == process_id:
                 return process
@@ -75,32 +85,41 @@ class System:
         """
         while True:
             result = self.get_next_execution_interval()
+
             if result is None:
                 break
+
             process_id, interval, has_overload = result
             current_process = self.get_process(process_id)
 
-            # Atualizar gráfico Gantt
-            self.update_gantt_chart(process_id, interval, has_overload)
+            print(f"Processo id: {process_id} sendo executado.")
 
             # Carregar processo na memória
             self.load_process(current_process)
 
-            # Atualizar gráfico de memória
-            self.update_memory_plot()
-            
-            # Verificar deadline_overrun e atualizar o gráfico de Gantt
-            self.check_and_update_deadline_overrun(process_id, interval)
+            # # Atualizar gráfico Gantt
+            # self.update_gantt_chart(process_id, interval, has_overload)
+            #
+            # # Atualizar gráfico de memória
+            # self.update_memory_plot()
+            #
+            # # Verificar deadline_overrun e atualizar o gráfico de Gantt
+            # self.check_and_update_deadline_overrun(process_id, interval)
 
-    def load_process(self, process):
+        time.sleep(1)
+
+    def load_process(self, process: Process):
         """
         Load process into memory.
 
         Parameters:
         - process (Process): Process object to load into memory.
         """
-        # Implemente a lógica de carregamento do processo na memória aqui
-        pass
+
+        id = process.id
+        number_of_pages = process.number_of_pages
+
+        self.memory.load(id, number_of_pages)
 
     def update_gantt_chart(self, process_id, interval, has_overload):
         """
@@ -140,3 +159,21 @@ class System:
 
                 # Atualizar o gráfico de Gantt com a sobrecarga
                 self.update_gantt_chart(process_id, overload_interval, True)
+
+    def calculate_average_turnaround(self):
+        total_turnaround = 0
+        number_of_processes = len(self.execution_intervals)
+
+        for process_id, intervals in self.execution_intervals.items():
+            arrival_time = self.get_process(process_id).arrival_time
+            total_execution_time = 0
+
+            if intervals:
+                last_interval = intervals[-1]
+                total_execution_time = last_interval[1]
+
+            turnaround = total_execution_time - arrival_time
+            total_turnaround += turnaround
+
+        average_turnaround = total_turnaround / number_of_processes
+        return average_turnaround
