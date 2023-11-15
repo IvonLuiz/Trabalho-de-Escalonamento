@@ -12,7 +12,7 @@ CSV_FILE = "csv/input_file.csv"
 if __name__ == "__main__":
     processes = CSVReader(CSV_FILE).get_processes()
     system = System(processes, overhead=1, quantum=2)
-    system.exec_algorithm(RoundRobin, 'fifo')
+    system.exec_algorithm(EDF, 'fifo')
 
     print(system.execution_intervals)
     print(system.deadline_overrun_intervals)

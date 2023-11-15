@@ -13,11 +13,12 @@ class EDF(Algorithm):
     def execute(self):
         time = 0
         current_process = None
+        self.processes.sort(key=lambda x: x.arrival_time)
         execution_intervals = {}
         deadline_overrun_intervals = {}
 
         # Case process enters late
-        self.__verify_late_arrival(time)
+        time = self.__verify_late_arrival(time)
 
         while True:
             current_process = next(iter(self.process_queue), None)
