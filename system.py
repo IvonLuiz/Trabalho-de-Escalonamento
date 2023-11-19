@@ -18,14 +18,15 @@ class System:
     - exec_algorithm(algorithm): Execute a scheduling algorithm on the processes.
     """
     
-    def __init__(self, processes, overhead, quantum):
-        self.processes = processes
-        self.overhead = overhead
-        self.quantum = quantum
+    def __init__(self): #processes, overhead, quantum, delay
+        self.processes = None
+        self.overhead = 0
+        self.quantum = 0
         self.current_time = 0
         self.execution_intervals = {}
         self.deadline_overrun_intervals = {}
         self.memory = None
+        self.delay = 0
 
     def exec_algorithm(self, algorithm: Algorithm, paging_algorithm):
         process_copy = copy.copy(self.processes)
@@ -106,7 +107,7 @@ class System:
             # # Verificar deadline_overrun e atualizar o gráfico de Gantt
             # self.check_and_update_deadline_overrun(process_id, interval)
 
-        time.sleep(1)
+        time.sleep(self.delay)
 
     def load_process(self, process: Process):
         """
@@ -177,3 +178,16 @@ class System:
 
         average_turnaround = total_turnaround / number_of_processes
         return average_turnaround
+
+    #Set
+    def set_processes_list(self, processes):
+        self.processes = processes
+
+    def set_quantum(self, quantum):
+        self.quantum = quantum
+
+    def set_overhead(self, overhead):
+        self.overhead = overhead
+
+    def set_delay(self, delay):
+        self.delay = delay
