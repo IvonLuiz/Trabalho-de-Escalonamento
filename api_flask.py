@@ -1,46 +1,67 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-
-from system import System
+from flask_socketio import SocketIO, emit
+from system import System  # Make sure 'System' is available in the same directory
 
 app = Flask(__name__)
-CORS(app)
+socketio = SocketIO(app)
+
 system_instance = System()
 
-#ainda definir quais serão as rotas a serem ouvidas
+processes_list_ram = []
+processes_list_disk = []
+gantt_matrix = []
+average_turnaround = 0
 
+# Route to initialize the system with received data
 @app.route('/api/start', methods=['POST'])
-def processar_dados():
+def process_data():
     try:
-        dados_json = request.get_json()
+        # Get JSON data from the request
+        data_json = request.get_json()
 
-        processes_list = dados_json.get('processesList', [])
-        scheduling_algorithm = dados_json.get('schedulingAlgorithm', '')
-        paging_algorithm = dados_json.get('pagingAlgorithm', '')
-        quantum = dados_json.get('quantum', 0)
-        overhead = dados_json.get('overhead', 0)
-        delay = dados_json.get('delay', 0)
+        # Extract information from received data
+        processes_list = data_json.get('processesList', [])
+        scheduling_algorithm = data_json.get('schedulingAlgorithm', '')
+        paging_algorithm = data_json.get('pagingAlgorithm', '')
+        quantum = data_json.get('quantum', 0)
+        overhead = data_json.get('overhead', 0)
+        delay = data_json.get('delay', 0)
 
+        # Configure the system with received data
         system_instance.set_processes_list(processes_list)
         system_instance.set_quantum(quantum)
         system_instance.set_overhead(overhead)
         system_instance.set_delay(delay)
 
+        # Execute the defined algorithms
         system_instance.exec_algorithm(scheduling_algorithm, paging_algorithm)
 
-        response = {'status': 'success', 'message': 'Dados recebidos com sucesso.'}
-
+        # Respond with success status
+        response = {'status': 'success', 'message': 'Data received successfully.'}
         return jsonify(response), 200
+
     except Exception as e:
+        # Respond with error status in case of exception
         response = {'status': 'error', 'message': str(e)}
         return jsonify(response), 500
 
 
+# Route to reset the system instance
 @app.route('/api/reset', methods=['POST'])
 def reset_system():
     global system_instance
-    system_instance = System()  # Reinicia a instância da classe System
+    system_instance = System()  # Reset the instance of the System class
     return jsonify({"status": "success", "message": "System instance reset"})
 
+
+@socketio.on('connect')
+def handle_connect():
+    # Send initial data when a WebSocket client connects
+    emit('update', {'processes_list_ram': processes_list_ram, 'processes_list_disk': processes_list_disk, 'gantt_matrix': gantt_matrix})
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+
+

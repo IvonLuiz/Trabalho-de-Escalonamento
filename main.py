@@ -11,7 +11,10 @@ CSV_FILE = "csv/input_file.csv"
 # Example usage
 if __name__ == "__main__":
     processes = CSVReader(CSV_FILE).get_processes()
-    system = System(processes, overhead=1, quantum=2)
+    system = System()
+    system.set_processes_list(processes)
+    system.set_quantum(2)
+    system.set_overhead(1)
     system.exec_algorithm(RoundRobin, 'fifo')
 
     print(system.execution_intervals)
