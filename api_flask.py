@@ -14,7 +14,7 @@ gantt_matrix = []
 average_turnaround = 0
 
 # Route to initialize the system with received data
-@app.route('/api/start', methods=['POST'])
+@socketio.on('start')
 def process_data():
     try:
         # Get JSON data from the request
@@ -37,22 +37,24 @@ def process_data():
         # Execute the defined algorithms
         system_instance.exec_algorithm(scheduling_algorithm, paging_algorithm)
 
-        # Respond with success status
-        response = {'status': 'success', 'message': 'Data received successfully.'}
-        return jsonify(response), 200
+        # Emit success status to the client
+        socketio.emit('update', {'status': 'success', 'message': 'Data received successfully.'})
 
     except Exception as e:
-        # Respond with error status in case of exception
-        response = {'status': 'error', 'message': str(e)}
-        return jsonify(response), 500
+        # Emit error status to the client
+        socketio.emit('update', {'status': 'error', 'message': str(e)})
 
 
 # Route to reset the system instance
-@app.route('/api/reset', methods=['POST'])
+@socketio.on('reset_system')
 def reset_system():
     global system_instance
     system_instance = System()  # Reset the instance of the System class
-    return jsonify({"status": "success", "message": "System instance reset"})
+    send_update()
+
+
+def send_update():
+    socketio.send({'processes_list_ram': processes_list_ram, 'processes_list_disk': processes_list_disk, 'gantt_matrix': gantt_matrix}, json=True)
 
 
 @socketio.on('connect')
