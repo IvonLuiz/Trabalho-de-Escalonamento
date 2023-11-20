@@ -36,32 +36,25 @@ def process_data(data_json):
     system_instance.set_delay(int(data['delay']))
     system_instance.set_processes_list(processList)
     
-    # # Execute the defined algorithms
+    # Execute the defined algorithms
     system_instance.exec_algorithm(data['cpuAlgorithm'], data['memoryAlgorithm'])
 
-    #Initial emit with disk, ram and empty gantt matrix
-    socketio.emit('diskTest', {'disk': system_instance.memory.disk.storage})
+    while True:
+        # Execute each CPU cycle in a while loop
+        if not system_instance.process_execution():
+            break
 
-    #Execute each CPU cycle in a while loop
-    system_instance.process_execution()
-    
-
-    # Emit success status to the client
-    #socketio.emit('update', {'status': 'success', 'message': 'Data received successfully.'})
-    socketio.emit('diskTest', {'disk': system_instance.memory.disk.storage})
-
+        # Initial emit with disk, ram and empty gantt matrix
+        socketio.emit('diskTest', {'disk': system_instance.memory.disk.storage})
+        print('executei')
 
 # Route to reset the system instance
 @socketio.on('reset_system')
 def reset_system():
     global system_instance
     system_instance = System()  # Reset the instance of the System class
-    send_update()
-
-
-def send_update():
-    socketio.send({'processes_list_ram': processes_list_ram, 'processes_list_disk': processes_list_disk, 'gantt_matrix': gantt_matrix}, json=True)
-
+    socketio.emit('system_reset', {})
+    print('fiz reset')
 
 @socketio.on('connect')
 def handle_connect():
