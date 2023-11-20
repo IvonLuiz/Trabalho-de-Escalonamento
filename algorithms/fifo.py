@@ -3,7 +3,11 @@ from process import Process
 
 
 class Fifo(Algorithm):
-
+    
+    def __init__(self, processes=None, overhead=0, quantum=0):
+        super().__init__(processes=processes)
+    
+    
     def execute(self):
         self.processes.sort(key=lambda x: x.arrival_time)  # Orders processes based on arrival time
         time = 0
