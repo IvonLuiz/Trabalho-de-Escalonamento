@@ -6,9 +6,8 @@ class Process:
         self.execution_time = exec_time
         self.deadline = deadline
         self.priority = priority
-        self.number_of_pages= number_of_pages
-        
+        self.number_of_pages = number_of_pages
+
     def reduce_exec_time(self, time_reduce):
-        self.execution_time -= time_reduce 
-        
+        self.execution_time -= time_reduce
 

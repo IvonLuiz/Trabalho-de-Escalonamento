@@ -8,3 +8,6 @@ class Algorithm:
     def execute(self) -> None:
         """Abstract method"""
         raise NotImplementedError("No execution implemented")
+    
+    def __detect_deadline_overrun(self, process, time) -> None:
+        raise NotImplementedError("No execution implemented")

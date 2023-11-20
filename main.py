@@ -1,15 +1,50 @@
 from system import System
 from algorithms.fifo import Fifo
 from algorithms.sjf import SJF
-from algorithms.round_robin import RoundRobin
 from algorithms.edf import EDF
+from algorithms.round_robin import RoundRobin
+from csv_reader import CSVReader
+from process import Process
 
-system = System(overhead=0, quantum=2)
+CSV_FILE = "csv/input_file.csv"
 
-system.add_process(0, 10, 5, 2)
-system.add_process(3, 8, 2, 1)
-system.add_process(6, 12, 1, 3)
+# Example usage
+if __name__ == "__main__":
+    processes = CSVReader(CSV_FILE).get_processes()
+    system = System()
+    system.set_processes_list(processes)
+    system.set_quantum(2)
+    system.set_overhead(1)
+    system.exec_algorithm(RoundRobin, 'fifo')
 
-system.exec_algorithm(Fifo)
-system.exec_algorithm(SJF)
-system.exec_algorithm(EDF)
+    print(system.execution_intervals)
+    print(system.deadline_overrun_intervals)
+
+    print(system.calculate_average_turnaround())
+
+    print("Estado inicial RAM/DISK")
+    print(system.memory.ram.storage)
+    print(system.memory.disk.storage)
+
+    system.process_execution()
+
+    print("Estado final RAM/DISK")
+    print(system.memory.ram.storage)
+    print(system.memory.disk.storage)
+
+
+    # print("P1 entra na RAM")
+    # print(system.memory.ram.storage)
+    # print(system.memory.disk.storage)
+    #
+    # system.process_execution()
+    #
+    # print("P3 entra na RAM")
+    # print(system.memory.ram.storage)
+    # print(system.memory.disk.storage)
+    #
+    # system.process_execution()
+    #
+    # print("P2 entra na RAM")
+    # print(system.memory.ram.storage)
+    # print(system.memory.disk.storage)

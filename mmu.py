@@ -2,17 +2,6 @@ from memory.ramMemory import Ram
 from memory.diskMemory import Disk
 from process import Process
 
-
-process= []
-#id, exec_time, priority, deadline, number_of_pages=5, arrival_time=0
-process.append(Process(1, 0, 10, 5, 20, 0))
-process.append(Process(2, 3, 8, 2, 13, 0))
-process.append(Process(3, 6, 12, 1, 15, 0))
-process.append(Process(4, 0, 10, 5, 10, 0))
-process.append(Process(9, 0, 10, 5, 43, 0))
-
-
-
 class MemoryManagementUnit:
     def __init__(self, algorithm, processList) -> None:
         self.ram= Ram(50,50)
@@ -26,8 +15,6 @@ class MemoryManagementUnit:
         while len(processList)>0:
             self.disk.storeItem(self.processList[0].id, self.processList[0].number_of_pages)
             self.processList.pop(0)
-
-
 
   
 
@@ -55,8 +42,7 @@ class MemoryManagementUnit:
         lookup= self.lookup(processId, numberOfPages)
         spaceNeeded= numberOfPages-lookup
         pagesWritten= 0
-        removedFromDisk = 0
-        storedOnDisk = 0
+
 
         if processId == self.removalQueue[0] and spaceNeeded>0:
             self.removeFromLists(0)
@@ -66,21 +52,18 @@ class MemoryManagementUnit:
                 #Remover os dados do processo do disco
                 if spaceNeeded < self.ram.storageLeft:
                     self.disk.removeItem(processId, spaceNeeded)
-                    removedFromDisk += spaceNeeded
                 else:
-                    self.disk.removeItem(processId, self.ram.storageLeft)
-                    removedFromDisk += self.ram.storageLeft
+                    self.disk.removeItem(processId, self.ram.storageLeft)                    
                 written= self.ram.write(processId, self.removalQueue[0], spaceNeeded)
             else:
                 written= self.ram.write(processId, self.removalQueue[0], spaceNeeded)
                 
                 #Retirar do disco a quantidade que foi passada para a ram
                 self.disk.removeItem(processId, written)
-                removedFromDisk += written
+
 
             #Colocar no disco a quantidade que eu sobreescrevi na ram
             self.disk.storeItem(self.removalQueue[0], written)
-            storedOnDisk += written
 
             spaceNeeded-= written
             pagesWritten+=written
@@ -88,13 +71,7 @@ class MemoryManagementUnit:
             if self.pages[0] <= 0:
                 self.removeFromLists(0)
             
-            
-        print(f"removedFromDisk = {removedFromDisk}")
-        print(f"storedOnDisk = {storedOnDisk}" )
-        print(f"pagesWritten = {pagesWritten}")
         return pagesWritten
-
-
 
 
     def fifo(self, processId, numberOfPages):
@@ -108,8 +85,6 @@ class MemoryManagementUnit:
             return
 
 
-
-
     def lru(self, processId, numberOfPages):
         pagesWritten= self.ramWrite(processId, numberOfPages)
         if pagesWritten == 0: #Processo está na memória em sua integridade (HIT)
@@ -117,10 +92,9 @@ class MemoryManagementUnit:
             #Encontro o local do processo na lista de remoção
             index= self.removalQueue.index(processId)
             self.removeFromLists(index) #Removo das listas
-
+            
             #Coloco o processo no fim da lista de remoção pois foi o processo mais recente
             self.appendToLists(processId, numberOfPages)
-            
             return
         else:
 
@@ -129,7 +103,6 @@ class MemoryManagementUnit:
         
             return     
 
-    
 
 
     def appendToLists(self, processId, numberOfPages):
@@ -141,73 +114,4 @@ class MemoryManagementUnit:
         self.pages.pop(index) #Removo da lista de páginas no index encontrado
 
 
-"""process= []
-#id, exec_time, priority, deadline, number_of_pages=5, arrival_time=0
-process.append(Process(1, 0, 10, 5, 20, 0))
-process.append(Process(2, 3, 8, 2, 13, 0))
-process.append(Process(3, 6, 12, 1, 15, 0))
-process.append(Process(4, 0, 10, 5, 10, 0))
-process.append(Process(9, 0, 10, 5, 43, 0))"""
-
-
-mmu= MemoryManagementUnit('lru', process)
-
-print(mmu.ram.storage)
-print(mmu.disk.storage)
-
-print("id = 1")
-mmu.load(1, 20)
-print(mmu.removalQueue)
-print(mmu.pages)
-print(mmu.ram.storage)
-print(mmu.disk.storage)
-
-
-print("id = 3")
-mmu.load(3, 15)
-print(mmu.removalQueue)
-print(mmu.pages)
-print(mmu.ram.storage)
-print(mmu.disk.storage)
-
-
-
-print("id = 1")
-mmu.load(1, 20)
-print(mmu.removalQueue)
-print(mmu.pages)
-print(mmu.ram.storage)
-print(mmu.disk.storage)
-
-
-print("id = 9")
-mmu.load(9, 43)
-print(mmu.removalQueue)
-print(mmu.pages)
-print(mmu.ram.storage)
-print(mmu.disk.storage)
-
-
-print("id = 4")
-mmu.load(4, 10)
-print(mmu.removalQueue)
-print(mmu.pages)
-print(mmu.ram.storage)
-print(mmu.disk.storage)
-
-
-print("id = 9")
-mmu.load(9, 43)
-print(mmu.removalQueue)
-print(mmu.pages)
-print(mmu.ram.storage)
-print(mmu.disk.storage)
-
-
-print("id = 2")
-mmu.load(2, 13)
-print(mmu.removalQueue)
-print(mmu.pages)
-print(mmu.ram.storage)
-print(mmu.disk.storage)
 
