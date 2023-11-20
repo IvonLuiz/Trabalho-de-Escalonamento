@@ -15,7 +15,7 @@ if __name__ == "__main__":
     system.set_processes_list(processes)
     system.set_quantum(2)
     system.set_overhead(1)
-    system.exec_algorithm(RoundRobin, 'fifo')
+    system.exec_algorithm(algorithm='RoundRobin', paging_algorithm='fifo')
 
     print(system.execution_intervals)
     print(system.deadline_overrun_intervals)

@@ -28,10 +28,10 @@ class System:
         self.memory = None
         self.delay = 0
 
-    def exec_algorithm(self, algorithm: Algorithm, paging_algorithm):
+    def exec_algorithm(self, algorithm, paging_algorithm):
         process_copy = copy.copy(self.processes)
         process_copy_mmu = copy.copy(self.processes)
-        algorithm_scheduler = algorithm(process_copy)
+        algorithm_scheduler = self.get_algorithm_instance(algorithm)(process_copy)
         self.memory = MemoryManagementUnit(algorithm=paging_algorithm, processList=process_copy_mmu)
         self.execution_intervals, self.deadline_overrun_intervals = algorithm_scheduler.execute()
 
@@ -191,3 +191,23 @@ class System:
 
     def set_delay(self, delay):
         self.delay = delay
+
+    def get_algorithm_instance(self, algorithm_name):
+        algorithm_name_lower = algorithm_name.lower()
+
+        # "Switch case" simples para diferentes algoritmos
+        if algorithm_name_lower == 'fifo':
+            from algorithms.fifo import Fifo
+            return Fifo
+        elif algorithm_name_lower == 'sjf':
+            from algorithms.sjf import SJF
+            return SJF
+        elif algorithm_name_lower == 'edf':
+            from algorithms.edf import EDF
+            return EDF
+        elif algorithm_name_lower == 'roundrobin':
+            from algorithms.round_robin import RoundRobin
+            return RoundRobin
+        else:
+            print(f"Algoritmo desconhecido: {algorithm_name}")
+            return None
