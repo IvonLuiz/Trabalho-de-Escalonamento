@@ -1,6 +1,5 @@
 import copy
 import time
-
 from process import Process
 from algorithms.algorithm import Algorithm
 from mmu import MemoryManagementUnit
@@ -97,7 +96,8 @@ class System:
 
             # Carregar processo na memória
             self.load_process(current_process)
-
+            print(self.memory.disk.storage)
+            print(self.memory.ram.storage)
             # # Atualizar gráfico Gantt
             # self.update_gantt_chart(process_id, interval, has_overload)
             #
@@ -106,8 +106,8 @@ class System:
             #
             # # Verificar deadline_overrun e atualizar o gráfico de Gantt
             # self.check_and_update_deadline_overrun(process_id, interval)
-
-        time.sleep(self.delay)
+            time.sleep(self.delay)
+            
 
     def load_process(self, process: Process):
         """
@@ -205,7 +205,7 @@ class System:
         elif algorithm_name_lower == 'edf':
             from algorithms.edf import EDF
             return EDF
-        elif algorithm_name_lower == 'roundrobin':
+        elif algorithm_name_lower == 'rr':
             from algorithms.round_robin import RoundRobin
             return RoundRobin
         else:

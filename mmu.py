@@ -16,6 +16,8 @@ class MemoryManagementUnit:
             self.disk.storeItem(self.processList[0].id, self.processList[0].number_of_pages)
             self.processList.pop(0)
 
+
+
   
 
     def load(self, processId, numberOfPages):
