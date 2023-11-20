@@ -5,9 +5,7 @@ from process import Process
 class EDF(Algorithm):
 
     def __init__(self, processes=[], overhead=1, quantum=2):
-        self.processes = processes
-        self.overhead = overhead
-        self.quantum = quantum
+        super().__init__(processes=processes, overhead=overhead, quantum=quantum)
         self.process_queue = {} # Keys: process, Values: deadline - execution_time
 
     def execute(self):
