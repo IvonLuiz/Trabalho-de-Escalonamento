@@ -30,7 +30,7 @@ class System:
     def exec_algorithm(self, algorithm, paging_algorithm):
         process_copy = copy.copy(self.processes)
         process_copy_mmu = copy.copy(self.processes)
-        algorithm_scheduler = self.get_algorithm_instance(algorithm)(process_copy)
+        algorithm_scheduler = self.get_algorithm_instance(algorithm)(processes=process_copy, overhead=self.overhead, quantum=self.quantum)
         self.memory = MemoryManagementUnit(algorithm=paging_algorithm, processList=process_copy_mmu)
         self.execution_intervals, self.deadline_overrun_intervals = algorithm_scheduler.execute()
 

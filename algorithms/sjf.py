@@ -4,6 +4,10 @@ from process import Process
 
 class SJF(Algorithm):
 
+    def __init__(self, processes=None, overhead=0, quantum=0):
+        super().__init__(processes=processes)
+
+
     def execute(self):
         time = 0
         execution_intervals = {}
