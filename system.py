@@ -81,33 +81,33 @@ class System:
 
     def process_execution(self):
         """
-        Process execution loop.
+        Process execution.
         """
-        while True:
-            result = self.get_next_execution_interval()
+        result = self.get_next_execution_interval()
 
-            if result is None:
-                break
+        if result is None:
+            return False
 
-            process_id, interval, has_overload = result
-            current_process = self.get_process(process_id)
+        process_id, interval, has_overload = result
+        current_process = self.get_process(process_id)
 
-            print(f"Processo id: {process_id} sendo executado.")
+        print(f"Processo id: {process_id} sendo executado.")
 
-            # Carregar processo na memória
-            self.load_process(current_process)
-            print(self.memory.disk.storage)
-            print(self.memory.ram.storage)
-            # # Atualizar gráfico Gantt
-            # self.update_gantt_chart(process_id, interval, has_overload)
-            #
-            # # Atualizar gráfico de memória
-            # self.update_memory_plot()
-            #
-            # # Verificar deadline_overrun e atualizar o gráfico de Gantt
-            # self.check_and_update_deadline_overrun(process_id, interval)
-            time.sleep(self.delay)
-            
+        # Carregar processo na memória
+        self.load_process(current_process)
+        print(self.memory.disk.storage)
+        print(self.memory.ram.storage)
+        # # Atualizar gráfico Gantt
+        # self.update_gantt_chart(process_id, interval, has_overload)
+        #
+        # # Atualizar gráfico de memória
+        # self.update_memory_plot()
+        #
+        # # Verificar deadline_overrun e atualizar o gráfico de Gantt
+        # self.check_and_update_deadline_overrun(process_id, interval)
+        time.sleep(self.delay)
+
+        return True
 
     def load_process(self, process: Process):
         """
@@ -132,13 +132,6 @@ class System:
         - has_overload (bool): Indicates if there is overload after the interval.
         """
         # Implemente a lógica de atualização do gráfico Gantt aqui
-        pass
-
-    def update_memory_plot(self):
-        """
-        Update memory plot.
-        """
-        # Implemente a lógica de atualização do gráfico de memória aqui
         pass
     
 ##-----AINDA É PRECISO TESTAR ESSA PARTE-----#
