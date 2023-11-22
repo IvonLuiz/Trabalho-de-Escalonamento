@@ -152,13 +152,12 @@ class System:
                 self.gant_matrix[process_id][self.time_for_gant] = 1
 
         # Find the running process (in the Gantt abstraction)
-        for interval_start, interval_end in interval:
-            if interval_start <= self.time_for_gant <= interval_end:
-                self.gant_matrix[current_process.id][self.time_for_gant] = 2
+        if interval[0] <= self.time_for_gant <= interval[1]:
+            self.gant_matrix[current_process][self.time_for_gant] = 2
 
         # Apply overhead
         if overload and self.time_for_gant == self.current_time - 1:
-            self.gant_matrix[current_process.id][self.time_for_gant] = 3
+            self.gant_matrix[current_process][self.time_for_gant] = 3
 
         self.time_for_gant += 1
         return True
