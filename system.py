@@ -133,7 +133,7 @@ class System:
         if self.time_for_gant == self.current_time:
             return False
 
-        # Completa primeiro com zeros
+        # Complete first with zeros
         all_processes_id = set(self.execution_intervals.keys())
         if not self.gant_matrix:
             # Inicializa o estado de todos os processos como 'Não chegou'
@@ -145,18 +145,18 @@ class System:
 
         current_process, interval, overload = self.current_process_execution
 
-        # Econtra processos que estão em espera
+        # Find processes that are waiting
         for process_id in all_processes_id:
             arrival_time = self.get_process(process_id).arrival_time  # Substitua pela sua lógica real
             if self.time_for_gant >= arrival_time:
                 self.gant_matrix[process_id][self.time_for_gant] = 1
 
-        # Acha o processo em execução (na abstração Gantt)
+        # Find the running process (in the Gantt abstraction)
         for interval_start, interval_end in interval:
             if interval_start <= self.time_for_gant <= interval_end:
                 self.gant_matrix[current_process.id][self.time_for_gant] = 2
 
-        # Aplica o overhead
+        # Apply overhead
         if overload and self.time_for_gant == self.current_time - 1:
             self.gant_matrix[current_process.id][self.time_for_gant] = 3
 
