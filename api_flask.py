@@ -38,21 +38,34 @@ def process_data(data_json):
     
     # Execute the defined algorithms
     system_instance.exec_algorithm(data['cpuAlgorithm'], data['memoryAlgorithm'])
-
+    socketio.emit('initialValues',[
+        {'disk': system_instance.memory.disk.storage},
+        {'ram': system_instance.memory.ram.storage},
+        {'gantt': gantt_matrix}]
+    )
     while True:
         # Execute each CPU cycle in a while loop
         if not system_instance.process_execution():
             break
+        socketio.emit('updatedValues',[
+        {'disk': system_instance.memory.disk.storage},
+        {'ram': system_instance.memory.ram.storage},
+        {'gantt': gantt_matrix}]
+        )
 
         while system_instance.update_gantt_chart():
             socketio.emit('diskTest', {'disk': system_instance.memory.disk.storage})
+        # Initial emit with disk, ram and empty gantt matrix
+        #socketio.emit('diskTest', {'disk': system_instance.memory.disk.storage})
+        print('executei')
 
+#TODO resetar a classe system sozinha após o fim da execução
 # Route to reset the system instance
 @socketio.on('reset_system')
 def reset_system():
     global system_instance
     system_instance = System()  # Reset the instance of the System class
-    socketio.emit('system_reset', {})
+    #socketio.emit('system_reset', {})
     print('fiz reset')
 
 @socketio.on('connect')
