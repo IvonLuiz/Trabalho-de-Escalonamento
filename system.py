@@ -22,8 +22,11 @@ class System:
         self.overhead = 0
         self.quantum = 0
         self.current_time = 0
+        self.time_for_gant = 0
         self.execution_intervals = {}
         self.deadline_overrun_intervals = {}
+        self.gant_matrix = {}
+        self.current_process_execution = None
         self.memory = None
         self.delay = 0
 
@@ -60,6 +63,7 @@ class System:
 
         # Update the current time
         self.current_time = closest_interval[1] + (1 if has_overload else 0)
+        self.current_process_execution = process_id, closest_interval, has_overload
 
         return process_id, closest_interval, has_overload
 
@@ -122,17 +126,42 @@ class System:
 
         self.memory.load(id, number_of_pages)
 
-    def update_gantt_chart(self, process_id, interval, has_overload):
+    def update_gantt_chart(self):
         """
         Update Gantt chart with the latest execution interval.
-
-        Parameters:
-        - process_id (int): ID of the executed process.
-        - interval (tuple): Execution interval.
-        - has_overload (bool): Indicates if there is overload after the interval.
         """
-        # Implemente a lógica de atualização do gráfico Gantt aqui
-        pass
+        if self.time_for_gant == self.current_time:
+            return False
+
+        # Completa primeiro com zeros
+        all_processes_id = set(self.execution_intervals.keys())
+        if not self.gant_matrix:
+            # Inicializa o estado de todos os processos como 'Não chegou'
+            for process_id in all_processes_id:
+                self.gant_matrix[process_id] = [0]  # 0 = Não chegou
+        else:
+            for process_id in all_processes_id:
+                self.gant_matrix[process_id].append(0)
+
+        current_process, interval, overload = self.current_process_execution
+
+        # Econtra processos que estão em espera
+        for process_id in all_processes_id:
+            arrival_time = self.get_process(process_id).arrival_time  # Substitua pela sua lógica real
+            if self.time_for_gant >= arrival_time:
+                self.gant_matrix[process_id][self.time_for_gant] = 1
+
+        # Acha o processo em execução (na abstração Gantt)
+        for interval_start, interval_end in interval:
+            if interval_start <= self.time_for_gant <= interval_end:
+                self.gant_matrix[current_process.id][self.time_for_gant] = 2
+
+        # Aplica o overhead
+        if overload and self.time_for_gant == self.current_time - 1:
+            self.gant_matrix[current_process.id][self.time_for_gant] = 3
+
+        self.time_for_gant += 1
+        return True
     
 ##-----AINDA É PRECISO TESTAR ESSA PARTE-----#
     def check_and_update_deadline_overrun(self, process_id, interval):

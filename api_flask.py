@@ -44,9 +44,8 @@ def process_data(data_json):
         if not system_instance.process_execution():
             break
 
-        # Initial emit with disk, ram and empty gantt matrix
-        socketio.emit('diskTest', {'disk': system_instance.memory.disk.storage})
-        print('executei')
+        while system_instance.update_gantt_chart():
+            socketio.emit('diskTest', {'disk': system_instance.memory.disk.storage})
 
 # Route to reset the system instance
 @socketio.on('reset_system')
