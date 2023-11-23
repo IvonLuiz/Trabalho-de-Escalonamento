@@ -28,7 +28,7 @@ def process_data(data_json):
         process_list.append(current_process)
     system_instance.set_quantum(int(data['quantum']))
     system_instance.set_overhead(int(data['overHead']))
-    system_instance.set_delay(int(data['delay']))
+    system_instance.set_delay(float(data['delay']))
     system_instance.set_processes_list(process_list)
     
     # Execute the defined algorithms
@@ -49,8 +49,10 @@ def process_data(data_json):
                 {'ram': system_instance.memory.ram.storage},
                 {'gantt': system_instance.gant_matrix}]
             )
-
+            print(system_instance.gant_matrix)
             time.sleep(int(data['delay']))
+
+    socketio.emit('average_turnaround', system_instance.calculate_average_turnaround())
 
     reset_system()
 
