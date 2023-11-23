@@ -164,9 +164,8 @@ class System:
             true_deadline = process.arrival_time + process.deadline
 
             # Check if there was a deadline
-            if self.execution_intervals[process_id][-1][1] > true_deadline:
+            if self.time_for_gant >= true_deadline:
                 return True
-
             return False
 
     def calculate_average_turnaround(self):
