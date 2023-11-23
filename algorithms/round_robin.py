@@ -68,23 +68,9 @@ class RoundRobin(Algorithm):
 
     def __detect_deadline_overrun(self, process: Process, time):
         true_deadline = (process.arrival_time + process.deadline)
-        deadline_overrun = time - true_deadline
-        # Returns 0 if there isen't deadline_overrun
-        return max(0, deadline_overrun)
+
+        # Returns 0 if there isen't deadline_overrun     
+        if time > true_deadline:
+            return true_deadline
+        return 0
         
-        
-if __name__ == "__main__":
-    processes = [
-        Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
-        Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
-        Process(id=3, exec_time=7, priority=3, deadline=15, arrival_time=2),
-    ]
-
-    rr = RoundRobin(processes)
-    execution_intervals, deadline_overrun_intervals = rr.execute()
-
-    print(execution_intervals)
-
-    print("Execution Intervals:")
-    for process_id, interval in execution_intervals.items():
-        print(f"Process {process_id}: {interval}")

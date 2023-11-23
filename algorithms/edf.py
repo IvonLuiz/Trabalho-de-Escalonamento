@@ -44,7 +44,9 @@ class EDF(Algorithm):
 
             if len(self.process_queue) == 0:
                 break
-            
+        
+        print(execution_intervals)
+        print(deadline_overrun_intervals)
         return execution_intervals, deadline_overrun_intervals
 
     def __verify_arrival_while_processing(self, time):
@@ -83,9 +85,11 @@ class EDF(Algorithm):
 
     def __detect_deadline_overrun(self, process: Process, time):
         true_deadline = (process.arrival_time + process.deadline)
-        deadline_overrun = time - true_deadline
-        # Returns 0 if there isen't deadline_overrun
-        return max(0, deadline_overrun)
+
+        # Returns 0 if there isen't deadline_overrun     
+        if time > true_deadline:
+            return true_deadline
+        return 0
 
 
 if __name__ == "__main__":
