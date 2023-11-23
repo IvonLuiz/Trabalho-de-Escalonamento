@@ -56,7 +56,6 @@ class System:
                     closest_interval = (start_time, end_time)
                     has_overload = (
                             intervals.index(closest_interval) + 1 < len(intervals)
-                            and intervals[intervals.index(closest_interval) + 1][0] == closest_interval[1]
                     )
                     process_id = it_process_id
 
@@ -64,9 +63,10 @@ class System:
             return None
 
         # Update the current time
-        self.current_time = closest_interval[1] + (1 if has_overload else 0)
+        add = 1 if has_overload else 0
+        print(add)
+        self.current_time = closest_interval[1] + add
         self.current_process_execution = process_id, closest_interval, has_overload
-
         return process_id, closest_interval, has_overload
 
     def get_process(self, process_id) -> Process:
