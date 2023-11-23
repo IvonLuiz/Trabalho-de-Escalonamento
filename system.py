@@ -143,7 +143,9 @@ class System:
         # Find the running process (in the Gantt abstraction)
         if interval[0] <= self.time_for_gant <= interval[1]:
             self.gant_matrix[current_process][self.time_for_gant] = 2
-            if self.algorithm_name == "edf" and self.check_and_update_deadline_overrun(current_process):
+            if (self.algorithm_name == "edf"
+                    and self.check_and_update_deadline_overrun(current_process)[0]
+                    and self.time_for_gant >= self.check_and_update_deadline_overrun(current_process)[1]):
                 self.gant_matrix[current_process][self.time_for_gant] = 4
 
         # Apply overhead
@@ -165,8 +167,8 @@ class System:
 
             # Check if there was a deadline
             if self.time_for_gant >= true_deadline:
-                return True
-            return False
+                return True, true_deadline
+            return False, None
 
     def calculate_average_turnaround(self):
         total_turnaround = 0

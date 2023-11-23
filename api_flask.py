@@ -30,7 +30,7 @@ def process_data(data_json):
     system_instance.set_overhead(int(data['overHead']))
     system_instance.set_delay(float(data['delay']))
     system_instance.set_processes_list(process_list)
-    
+    print(float(data['delay']))
     # Execute the defined algorithms
     system_instance.exec_algorithm(data['cpuAlgorithm'], data['memoryAlgorithm'])
     socketio.emit('initialValues', [
