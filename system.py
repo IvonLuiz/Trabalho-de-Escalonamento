@@ -29,10 +29,12 @@ class System:
         self.current_process_execution = None
         self.memory = None
         self.delay = 0
+        self.algorithm_name = None
 
     def exec_algorithm(self, algorithm, paging_algorithm):
         process_copy = copy.copy(self.processes)
         process_copy_mmu = copy.copy(self.processes)
+        self.algorithm_name = algorithm
         algorithm_scheduler = self.get_algorithm_instance(algorithm)(processes=process_copy, overhead=self.overhead, quantum=self.quantum)
         self.memory = MemoryManagementUnit(algorithm=paging_algorithm, processList=process_copy_mmu)
         self.execution_intervals, self.deadline_overrun_intervals = algorithm_scheduler.execute()
@@ -95,21 +97,8 @@ class System:
         process_id, interval, has_overload = result
         current_process = self.get_process(process_id)
 
-        print(f"Processo id: {process_id} sendo executado.")
-
         # Carregar processo na memória
         self.load_process(current_process)
-        print(self.memory.disk.storage)
-        print(self.memory.ram.storage)
-        # # Atualizar gráfico Gantt
-        # self.update_gantt_chart(process_id, interval, has_overload)
-        #
-        # # Atualizar gráfico de memória
-        # self.update_memory_plot()
-        #
-        # # Verificar deadline_overrun e atualizar o gráfico de Gantt
-        # self.check_and_update_deadline_overrun(process_id, interval)
-        time.sleep(self.delay)
 
         return True
 
@@ -136,7 +125,7 @@ class System:
         # Complete first with zeros
         all_processes_id = set(self.execution_intervals.keys())
         if not self.gant_matrix:
-            # Inicializa o estado de todos os processos como 'Não chegou'
+            # Initializes the status of all processes to 'Not arrived' (0)
             for process_id in all_processes_id:
                 self.gant_matrix[process_id] = [0]  # 0 = Não chegou
         else:
@@ -147,13 +136,15 @@ class System:
 
         # Find processes that are waiting
         for process_id in all_processes_id:
-            arrival_time = self.get_process(process_id).arrival_time  # Substitua pela sua lógica real
-            if self.time_for_gant >= arrival_time:
+            arrival_time = self.get_process(process_id).arrival_time
+            if arrival_time <= self.time_for_gant < self.execution_intervals[process_id][-1][1]:
                 self.gant_matrix[process_id][self.time_for_gant] = 1
 
         # Find the running process (in the Gantt abstraction)
         if interval[0] <= self.time_for_gant <= interval[1]:
             self.gant_matrix[current_process][self.time_for_gant] = 2
+            if self.algorithm_name == "edf" and self.check_and_update_deadline_overrun(current_process):
+                self.gant_matrix[current_process][self.time_for_gant] = 4
 
         # Apply overhead
         if overload and self.time_for_gant == self.current_time - 1:
@@ -161,26 +152,22 @@ class System:
 
         self.time_for_gant += 1
         return True
-    
-##-----AINDA É PRECISO TESTAR ESSA PARTE-----#
-    def check_and_update_deadline_overrun(self, process_id, interval):
+
+    def check_and_update_deadline_overrun(self, process_id):
             """
-            Check for deadline_overrun and update the Gantt chart accordingly.
+            Check for deadline_overrun.
 
             Parameters:
             - process_id (int): ID of the executed process.
-            - interval (tuple): Execution interval.
             """
             process = self.get_process(process_id)
             true_deadline = process.arrival_time + process.deadline
 
-            # Verificar se houve deadline_overrun no intervalo
-            if interval[1] > true_deadline:
-                overload_start = max(interval[0], true_deadline)
-                overload_interval = (overload_start, interval[1])
+            # Check if there was a deadline
+            if self.execution_intervals[process_id][-1][1] > true_deadline:
+                return True
 
-                # Atualizar o gráfico de Gantt com a sobrecarga
-                self.update_gantt_chart(process_id, overload_interval, True)
+            return False
 
     def calculate_average_turnaround(self):
         total_turnaround = 0
@@ -200,7 +187,7 @@ class System:
         average_turnaround = total_turnaround / number_of_processes
         return average_turnaround
 
-    #Set
+    # Sets
     def set_processes_list(self, processes):
         self.processes = processes
 
@@ -216,7 +203,6 @@ class System:
     def get_algorithm_instance(self, algorithm_name):
         algorithm_name_lower = algorithm_name.lower()
 
-        # "Switch case" simples para diferentes algoritmos
         if algorithm_name_lower == 'fifo':
             from algorithms.fifo import Fifo
             return Fifo
@@ -230,5 +216,5 @@ class System:
             from algorithms.round_robin import RoundRobin
             return RoundRobin
         else:
-            print(f"Algoritmo desconhecido: {algorithm_name}")
+            print(f"Unknown algorithm: {algorithm_name}")
             return None

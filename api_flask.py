@@ -1,35 +1,35 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from flask_socketio import SocketIO, emit
-from system import System  # Make sure 'System' is available in the same directory
+import time
 import json
+
+from flask import Flask
+from flask_socketio import SocketIO
+from system import System
 from process import Process
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
-
 system_instance = System()
 
 
 # Route to initialize the system with received data
 @socketio.on('start')
 def process_data(data_json):
-    processList= []
+    process_list = []
     data = json.loads(data_json)
     # # Configure the system with received data
     for i in data['process']:
-        currentProcess= Process(
+        current_process = Process(
             int(i['id']), 
             int(i['execTime']),
             int(i['deadline']),
             int(i['numberOfPages']),
             int(i['arrivalTime']),    
         )
-        processList.append(currentProcess)
+        process_list.append(current_process)
     system_instance.set_quantum(int(data['quantum']))
     system_instance.set_overhead(int(data['overHead']))
     system_instance.set_delay(int(data['delay']))
-    system_instance.set_processes_list(processList)
+    system_instance.set_processes_list(process_list)
     
     # Execute the defined algorithms
     system_instance.exec_algorithm(data['cpuAlgorithm'], data['memoryAlgorithm'])
@@ -50,6 +50,8 @@ def process_data(data_json):
                 {'gantt': system_instance.gant_matrix}]
             )
 
+            time.sleep(int(data['delay']))
+
     reset_system()
 
 
@@ -57,9 +59,7 @@ def process_data(data_json):
 @socketio.on('reset_system')
 def reset_system():
     global system_instance
-    system_instance = System()  # Reset the instance of the System class
-    # socketio.emit('system_reset', {})
-    print('fiz reset')
+    system_instance = System()
 
 
 @socketio.on('connect')
