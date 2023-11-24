@@ -19,9 +19,6 @@ class EDF(Algorithm):
         time = self.__verify_late_arrival(time)
             
         while True:
-            print(time)
-            if time == 17 or time ==16 or time ==18:
-                print (self.process_queue)
             current_process = next(iter(self.process_queue), None)
             del self.process_queue[current_process]
 
@@ -50,8 +47,6 @@ class EDF(Algorithm):
             if len(self.process_queue) == 0:
                 break
         
-        print(execution_intervals)
-        print(deadline_overrun_intervals)
         return execution_intervals, deadline_overrun_intervals
 
 
