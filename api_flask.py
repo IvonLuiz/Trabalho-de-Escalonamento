@@ -50,7 +50,7 @@ def process_data(data_json):
                 {'gantt': system_instance.gant_matrix}]
             )
             print(system_instance.gant_matrix)
-            time.sleep(int(data['delay']))
+            time.sleep(float(data['delay']))
 
     socketio.emit('average_turnaround', system_instance.calculate_average_turnaround())
 
