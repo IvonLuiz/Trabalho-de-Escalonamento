@@ -38,8 +38,9 @@ class EDF(Algorithm):
                 current_process.reduce_exec_time(self.quantum)
 
                 
-                self.__add_process_with_priority(current_process, time)
-                self.__verify_arrival_while_processing(time)
+                added = self.__add_process_with_priority(current_process, time)
+                if (added == False):
+                    self.__verify_arrival_while_processing(time)
 
             # Case process enters late
             time = self.__verify_late_arrival(time)
@@ -52,13 +53,17 @@ class EDF(Algorithm):
 
     def __verify_arrival_while_processing(self, time):
         to_remove = []
+        added = False
         for i, proc in enumerate(self.processes):
             if proc.arrival_time <= time:
                 self.__add_process_with_priority(proc, time)
                 to_remove.append(i)
-
+                added = True
+                
         for index in reversed(to_remove):
             self.processes.pop(index)
+            
+        return added
 
 
     def __verify_late_arrival(self, time):
