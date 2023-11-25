@@ -63,10 +63,10 @@ class System:
             return None
 
         # Update the current time
-        add = 1 if has_overload else 0
-        print(add)
+        add = self.overhead if has_overload else 0
         self.current_time = closest_interval[1] + add
         self.current_process_execution = process_id, closest_interval, has_overload
+
         return process_id, closest_interval, has_overload
 
     def get_process(self, process_id) -> Process:
@@ -149,7 +149,7 @@ class System:
                 self.gant_matrix[current_process][self.time_for_gant] = 4
 
         # Apply overhead
-        if overload and self.time_for_gant == self.current_time - 1:
+        if overload and (self.current_time - self.time_for_gant) <= self.overhead:
             self.gant_matrix[current_process][self.time_for_gant] = 3
 
         self.time_for_gant += 1

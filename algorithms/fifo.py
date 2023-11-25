@@ -36,22 +36,3 @@ class Fifo(Algorithm):
 
     def __detect_deadline_overrun(self, process: Process, time):
         return 0
-
-
-# Example usage
-if __name__ == "__main__":
-    processes = [
-        Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
-        Process(id=2, exec_time=3, priority=2, deadline=8, arrival_time=1),
-        Process(id=3, exec_time=7, priority=3, deadline=15, arrival_time=2),
-    ]
-
-    fifo_scheduler = Fifo(processes)
-    execution_intervals, deadline_overrun_intervals = fifo_scheduler.execute()
-
-    print(execution_intervals)
-    print(deadline_overrun_intervals)
-    
-    print("Execution Intervals:")
-    for process_id, interval in execution_intervals.items():
-        print(f"Process {process_id}: {interval}")
