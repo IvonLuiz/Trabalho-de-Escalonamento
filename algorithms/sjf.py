@@ -38,18 +38,3 @@ class SJF(Algorithm):
 
     def __detect_deadline_overrun(self, process: Process, time):
         return 0
-    
-    
-if __name__ == "__main__":
-    processes = [
-        Process(id=1, exec_time=5, priority=1, deadline=10, arrival_time=0),
-        Process(id=2, exec_time=7, priority=2, deadline=8, arrival_time=1),
-        Process(id=3, exec_time=3, priority=3, deadline=15, arrival_time=2),
-    ]
-
-    sjf_scheduler = SJF(processes)
-    execution_intervals, deadline_overrun_intervals = sjf_scheduler.execute()
-    
-    print("Execution Intervals:")
-    for process_id, interval in execution_intervals.items():
-        print(f"Process {process_id}: {interval}")

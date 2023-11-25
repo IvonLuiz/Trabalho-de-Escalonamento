@@ -16,6 +16,8 @@ class MemoryManagementUnit:
             self.disk.storeItem(self.processList[0].id, self.processList[0].number_of_pages)
             self.processList.pop(0)
 
+
+
   
 
     def load(self, processId, numberOfPages):
@@ -49,12 +51,17 @@ class MemoryManagementUnit:
 
         while spaceNeeded>0:
             if self.ram.storageLeft > 0:
+
+                #Ram tem mais espaço que o necessario
                 #Remover os dados do processo do disco
                 if spaceNeeded < self.ram.storageLeft:
                     self.disk.removeItem(processId, spaceNeeded)
+
+                #Ram tem menos espaço que o necessário (ou igual)
                 else:
                     self.disk.removeItem(processId, self.ram.storageLeft)                    
                 written= self.ram.write(processId, self.removalQueue[0], spaceNeeded)
+                
             else:
                 written= self.ram.write(processId, self.removalQueue[0], spaceNeeded)
                 
